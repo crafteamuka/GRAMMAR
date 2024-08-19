@@ -1,68 +1,46 @@
-print("COMPARE AND CONTRAST")
-# This is a basic code to compare two user inputs.
-def compareandcontrast(): 
-    # Prevents blank inputs
-    def get_non_blank_input(prompt):
-        while True:
-            user_input = input(prompt).strip()
-            if user_input:
-                return user_input
-            else:
-                print("Input cannot be blank. Please try again.")
+import tkinter as tk
+from tkinter.filedialog import askopenfilename, asksaveasfilename
 
-    FirstInput = get_non_blank_input("Enter Your First Text Here: ")
-    SecondInput = get_non_blank_input("Enter Your Second Text Here: ")
+def open_file(window, text_edit):
+    filepath = askopenfilename(filetypes=[("Text Files", "*.txt")])
 
-    # Counts the number of letters in each input
-    def wordcounter():
-        print("Your first input has", len(FirstInput), "letters")
-        print("Your second input has", len(SecondInput), "letters")
+    if not filepath:
+        return
     
-    # Counts the number of words in each input
-    def count_words(input_text): 
-        words = input_text.split()
-        word_count = len(words)
-        return word_count
+    text_edit.delete(1.0, tk.END)
+    with open(filepath, "r") as f:
+        content = f.read()
+        text_edit.insert(tk.END, content)
+    window.title(f"Open File: {filepath}")
 
-    # Compares the two inputs using difference in length
-    def difference():
-        if len(FirstInput) > len(SecondInput):
-            first_difference = len(FirstInput) - len(SecondInput)
-            print("Your first input is longer than your second input by", first_difference, "letters")
-        elif len(FirstInput) < len(SecondInput):
-            second_difference = len(SecondInput) - len(FirstInput)
-            print("Your first input is shorter than your second input by", second_difference, "letters")
-        else:
-            print("Your first input has the same length as your second input")
+def save_file(window, text_edit):
+    filepath = asksaveasfilename(filetypes=[("Text Files", "*.txt")])
 
-    # Compare the two inputs and print the results
-    def compare():
-        if FirstInput == SecondInput:
-            print("No changes in your text")
-        else:
-            print("First Input:", FirstInput)
-            print("Second Input:", SecondInput)
-        
-        wordcounter()
-        difference()
+    if not filepath:
+        return
 
-        # Counts and prints the number of words in each input
-        def wordchanger():    
-            first_word_count = count_words(FirstInput)
-            second_word_count = count_words(SecondInput)
-        
-            if first_word_count == 1:
-                print(f"Your first input has {first_word_count} word.")
-            else:
-                print(f"Your first input has {first_word_count} words.")
-        
-            if second_word_count == 1:
-                print(f"Your second input has {second_word_count} word.")
-            else:
-                print(f"Your second input has {second_word_count} words.")
+    with open(filepath, "w") as f:
+        content = text_edit.get(1.0, tk.END)
+        f.write(content)
+    window.title(f"Save File: {filepath}")
 
-        wordchanger()
+def main():
+    window = tk.Tk()
+    window.title("LETTER")
+    window.rowconfigure(0, minsize=400)
+    window.columnconfigure(1, minsize=500)
 
-    compare()
+    text_edit = tk.Text(window, font="Arial")
+    text_edit.grid(row=0, column=1, sticky="nsew")
 
-compareandcontrast()
+    frame = tk.Frame(window, relief=tk.RAISED, bd=2)
+    save_button = tk.Button(frame, text="Save", command=lambda: save_file(window, text_edit))
+    open_button = tk.Button(frame, text="Open", command=lambda: open_file(window, text_edit))
+
+    save_button.grid(row=0, column=0, padx=5, pady=5, sticky="ew")
+    open_button.grid(row=1, column=0, padx=5, pady=5, sticky="ew")
+    frame.grid(row=0, column=0, sticky="ns")
+
+    window.mainloop()
+
+main()
